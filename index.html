@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>JRC Workmate | Futuristic Industrial Nexus</title>
+  <!-- Google Fonts + Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- GSAP for advanced animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: #0A0E1A;
+      color: #E8F0FF;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== FUTURISTIC COLOR SYSTEM ===== */
+    :root {
+      --neon-cyan: #00F0FF;
+      --neon-purple: #B300FF;
+      --neon-pink: #FF006E;
+      --neon-gold: #FFD700;
+      --deep-space: #0A0E1A;
+      --card-glass: rgba(15, 25, 45, 0.7);
+      --border-glow: rgba(0, 240, 255, 0.4);
+      --shadow-neon: 0 0 20px rgba(0, 240, 255, 0.4);
+      --gradient-cyan-purple: linear-gradient(135deg, #00F0FF, #B300FF);
+      --gradient-pink-gold: linear-gradient(45deg, #FF006E, #FFD700);
+    }
+
+    /* animated background */
+    .cyber-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(circle at 30% 40%, #0F1528, #05080F);
+    }
+    .grid-lines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.06) 1px, transparent 1px);
+      background-size: 55px 55px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* floating orbs - multiple moving objects */
+    .floating-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.35;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .floating-particle {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* navbar with icons */
+    .navbar {
+      background: rgba(10, 14, 26, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 2px solid var(--neon-cyan);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.2);
+    }
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0.9rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-img {
+      width: 55px;
+      height: 55px;
+      background: var(--gradient-cyan-purple);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+      overflow: hidden;
+    }
+    .logo-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .logo-text h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: var(--gradient-cyan-purple);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.8rem;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 600;
+      color: #CCE6FF;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+    }
+    .nav-links a i {
+      font-size: 1.1rem;
+    }
+    .nav-links a:before {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--gradient-cyan-purple);
+      transition: 0.3s;
+    }
+    .nav-links a {
+      position: relative;
+    }
+    .nav-links a:hover:before, .nav-links a.active:before {
+      width: 100%;
+    }
+    .nav-links a.active {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+    }
+    .cart-icon {
+      position: relative;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--neon-cyan);
+      transition: 0.2s;
+    }
+    .cart-icon:hover {
+      text-shadow: 0 0 15px var(--neon-cyan);
+      transform: scale(1.05);
+    }
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -14px;
+      background: var(--neon-pink);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 2px 7px;
+      border-radius: 30px;
+      box-shadow: 0 0 10px var(--neon-pink);
+    }
+    .page {
+      display: none;
+      animation: cyberReveal 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .active-page {
+      display: block;
+    }
+    @keyframes cyberReveal {
+      from { opacity: 0; transform: translateY(35px) scale(0.96); filter: blur(5px); }
+      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem 2rem;
+      position: relative;
+      z-index: 2;
+    }
+    /* futuristic buttons */
+    .btn-neon {
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+      border: none;
+      padding: 0.9rem 2rem;
+      border-radius: 60px;
+      font-weight: 700;
+      color: #0A0E1A;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    }
+    .btn-neon:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.9);
+    }
+    .btn-glass {
+      background: rgba(0, 240, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid var(--neon-cyan);
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      color: var(--neon-cyan);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-glass:hover {
+      background: rgba(0, 240, 255, 0.25);
+      box-shadow: 0 0 15px var(--neon-cyan);
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    .product-card {
+      background: var(--card-glass);
+      backdrop-filter: blur(14px);
+      border-radius: 32px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-glow);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+    }
+    .product-card:hover {
+      transform: translateY(-12px) scale(1.02);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 25px 45px rgba(0, 240, 255, 0.25);
+    }
+    .product-img {
+      width: 100%;
+      height: 190px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.4);
+    }
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.4s;
+    }
+    .product-card:hover .product-img img {
+      transform: scale(1.08);
+    }
+    /* cart sidebar */
+    .cart-sidebar {
+      position: fixed;
+      top: 0;
+      right: -480px;
+      width: 440px;
+      height: 100vh;
+      background: rgba(8, 12, 22, 0.98);
+      backdrop-filter: blur(24px);
+      border-left: 2px solid var(--neon-cyan);
+      z-index: 1100;
+      transition: right 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+      box-shadow: -10px 0 50px rgba(0, 0, 0, 0.6);
+    }
+    .cart-sidebar.open {
+      right: 0;
+    }
+    .cart-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 1050;
+      display: none;
+    }
+    /* movable object - futuristic drone */
+    .movable-drone {
+      position: fixed;
+      bottom: 35px;
+      right: 35px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, var(--neon-pink), var(--neon-purple));
+      border-radius: 28px;
+      cursor: grab;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.2rem;
+      box-shadow: 0 0 35px rgba(255, 0, 110, 0.8);
+      transition: 0.1s;
+      transform: rotate(5deg);
+      backdrop-filter: blur(4px);
+    }
+    .movable-drone:active {
+      cursor: grabbing;
+    }
+    /* footer always on bottom */
+    footer {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--neon-cyan);
+      text-align: center;
+      padding: 2rem;
+      margin-top: auto;
+      width: 100%;
+    }
+    .footer-icons {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    .footer-icons i {
+      color: var(--neon-cyan);
+      transition: 0.2s;
+    }
+    .footer-icons i:hover {
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px var(--neon-pink);
+    }
+    @media (max-width: 850px) {
+      .nav-container { flex-direction: column; }
+      .cart-sidebar { width: 90%; right: -90%; }
+      .container { padding: 1.2rem; }
+      .product-grid { gap: 1.2rem; }
+      .movable-drone { width: 65px; height: 65px; font-size: 1.6rem; bottom: 20px; right: 20px; }
+    }
+    @media (max-width: 550px) {
+      .logo-text h2 { font-size: 1.2rem; }
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.85rem; }
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0A0E1A; }
+    ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- dynamic backgrounds -->
+<div class="cyber-bg"></div>
+<div class="grid-lines"></div>
+
+<!-- floating orbs & particles (more objects) -->
+<div class="floating-orb" style="width: 320px; height: 320px; background: #00F0FF; top: 5%; left: -80px;"></div>
+<div class="floating-orb" style="width: 480px; height: 480px; background: #FF006E; bottom: -100px; right: -120px;"></div>
+<div class="floating-orb" style="width: 280px; height: 280px; background: #B300FF; top: 50%; right: 15%;"></div>
+<div class="floating-orb" style="width: 200px; height: 200px; background: #FFD700; bottom: 25%; left: 5%; opacity: 0.25;"></div>
+
+<div class="movable-drone" id="dragDrone">
+  <i class="fas fa-jet-fighter-up"></i>
+</div>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo-area">
+      <div class="logo-img">
+        <img src="./JRC Logo.png" alt="JRC Logo" id="siteLogo" onerror="this.src='https://placehold.co/200x200/00F0FF/0A0E1A?text=JRC'">
+      </div>
+      <div class="logo-text"><h2>JRC WORKMATE</h2></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" data-page="home" class="nav-link active"><i class="fas fa-home"></i> HOME</a></li>
+      <li><a href="#" data-page="products" class="nav-link"><i class="fas fa-microchip"></i> STORE</a></li>
+      <li><a href="#" data-page="engineering" class="nav-link"><i class="fas fa-cogs"></i> ENGINEERING</a></li>
+      <li><a href="#" data-page="contact" class="nav-link"><i class="fas fa-headset"></i> CONTACT</a></li>
+      <li><div class="cart-icon" id="cartIcon"><i class="fas fa-shopping-cart"></i><span id="cartCount" class="cart-count">0</span></div></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h3 style="color: var(--neon-cyan);"><i class="fas fa-cart-flatbed"></i> Quantum Cart</h3>
+    <button id="closeCartBtn" style="background: none; border: none; font-size: 2rem; color: var(--neon-pink); cursor: pointer;">&times;</button>
+  </div>
+  <div id="cartItemsList" style="flex:1; max-height: 55vh; overflow-y: auto;"></div>
+  <div style="border-top: 1px solid var(--neon-cyan); padding-top: 1rem;">
+    <h4>Total: ₹<span id="cartTotal">0</span></h4>
+    <button id="enquiryNowBtn" class="btn-neon" style="width:100%; margin-top: 1rem;"><i class="fab fa-whatsapp"></i> Enquiry via WhatsApp</button>
+    <button id="emailEnquiryBtn" class="btn-glass" style="width:100%; margin-top: 0.8rem;"><i class="fas fa-envelope"></i> Enquiry via Email</button>
+  </div>
+</div>
+
+<main style="flex:1;">
+  <!-- HOME PAGE -->
+  <div id="home-page" class="page active-page">
+    <div class="container">
+      <div style="background: rgba(15, 25, 45, 0.6); backdrop-filter: blur(18px); border-radius: 60px; padding: 3rem; border: 1px solid var(--neon-cyan); margin-bottom: 2rem;">
+        <span style="background: var(--neon-pink); color: white; padding: 0.4rem 1.2rem; border-radius: 40px; font-weight: 700;"><i class="fas fa-bolt"></i> NEXT-GEN INDUSTRY 5.0</span>
+        <h1 style="font-size: 3.5rem; font-weight: 800; margin: 1.2rem 0; background: var(--gradient-cyan-purple); background-clip: text; -webkit-background-clip: text; color: transparent;">WE ONLY SUPPLY <br><span style="color: var(--neon-pink);">THE BEST.</span> EVERY TIME.</h1>
+        <p style="font-size: 1.2rem; color: #B8E6FF;">AI-driven logistics · Cyber industrial tools · Global supply chain 4.0</p>
+        <button class="btn-neon" id="shopNowBtn" style="margin-top: 1.8rem;"><i class="fas fa-rocket"></i> Explore HyperStore</button>
+      </div>
+      <div class="product-grid">
+        <div class="product-card"><i class="fas fa-brain" style="font-size: 2.5rem; color: var(--neon-cyan);"></i><h3>AI Quality Core</h3><p>Neural inspection & ISO certified</p></div>
+        <div class="product-card"><i class="fas fa-globe" style="font-size: 2.5rem; color: var(--neon-pink);"></i><h3>Quantum Logistics</h3><p>Pan-India & orbital shipping</p></div>
+        <div class="product-card"><i class="fas fa-head-side-vr" style="font-size: 2.5rem; color: var(--neon-gold);"></i><h3>24/7 Cyber Support</h3><p>AI agents + human experts</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS PAGE -->
+  <div id="products-page" class="page">
+    <div class="container">
+      <h2 style="font-size: 2.2rem; background: var(--gradient-cyan-purple); background-clip: text; -webkit-background-clip: text; color: transparent;"><i class="fas fa-microchip"></i> NEON INDUSTRIAL GEAR</h2>
+      <div class="product-grid" id="productsGrid"></div>
+    </div>
+  </div>
+
+  <!-- ENGINEERING PAGE -->
+  <div id="engineering-page" class="page">
+    <div class="container">
+      <h2 style="color: var(--neon-cyan); font-size: 2.2rem;"><i class="fas fa-robot"></i> CYBER FABRICATION LAB</h2>
+      <div class="product-grid">
+        <div class="product-card"><i class="fas fa-fire" style="color: var(--neon-pink); font-size: 2rem;"></i><h3>CNC Plasma/Flame</h3><p>5-Axis precision cutting</p></div>
+        <div class="product-card"><i class="fas fa-welding-machine" style="color: var(--neon-cyan); font-size: 2rem;"></i><h3>Laser Welding & Fab</h3><p>All metal fabrication</p></div>
+        <div class="product-card"><i class="fas fa-cogs" style="color: var(--neon-purple); font-size: 2rem;"></i><h3>Reverse Engineering</h3><p>3D scanning & legacy parts</p></div>
+        <div class="product-card"><i class="fas fa-warehouse" style="color: var(--neon-gold); font-size: 2rem;"></i><h3>Smart Material Handling</h3><p>Automated trolleys, racks</p></div>
+      </div>
+      <div style="background: rgba(179, 0, 255, 0.2); border: 1px solid var(--neon-purple); border-radius: 32px; padding: 1.8rem; margin-top: 1rem;"><i class="fas fa-star-of-life"></i> Custom Tools: Impact sockets, ring spanners, open end spanners — made via Industry 4.0</div>
+    </div>
+  </div>
+
+  <!-- CONTACT PAGE -->
+  <div id="contact-page" class="page">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 2rem;">
+        <div style="background: rgba(20,30,55,0.6); backdrop-filter: blur(14px); border-radius: 40px; padding: 2rem; border: 1px solid var(--neon-cyan);">
+          <i class="fas fa-map-marker-alt" style="color: var(--neon-pink); font-size: 2rem;"></i>
+          <h3>HyperSpace HQ</h3>
+          <p>49, Madha kovil street, Oragadam, Chengalpattu District -603109</p>
+          <hr style="margin: 1rem 0; border-color: var(--neon-cyan);">
+          <p><i class="fas fa-phone"></i> <a href="tel:+916379537625" style="color: var(--neon-cyan);">+91 63795 37625</a></p>
+          <p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/916379537625" style="color: #25D366;">WhatsApp</a> | <a href="https://wa.me/917708717490" style="color: var(--neon-cyan);">+91 77087 17490</a></p>
+          <p><i class="fas fa-envelope"></i> <a href="mailto:jrctradingworkmate@gmail.com" style="color: var(--neon-purple);">jrctradingworkmate@gmail.com</a></p>
+        </div>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 40px; padding: 2rem; border: 1px solid var(--neon-pink);">
+          <h3><i class="fas fa-paper-plane"></i> Neural Enquiry</h3>
+          <button id="whatsappContactBtn" class="btn-neon" style="background: #25D366; box-shadow: none;"><i class="fab fa-whatsapp"></i> Instant WhatsApp</button>
+          <button id="mailContactBtn" class="btn-glass" style="margin-top: 1rem;"><i class="fas fa-envelope"></i> Email Core</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-icons">
+    <i class="fab fa-whatsapp"></i>
+    <i class="fab fa-instagram"></i>
+    <i class="fab fa-linkedin-in"></i>
+    <i class="fas fa-envelope"></i>
+  </div>
+  <p>© 2025 JRC WORKMATE — Cyber Industrial Edge | <i class="fas fa-infinity"></i> Future-Ready Supply Chain</p>
+  <p style="margin-top: 0.5rem; font-size: 0.8rem;"><i class="fas fa-shield-alt"></i> Certified Quality | Global Delivery</p>
+</footer>
+
+<script>
+  // PRODUCTS DATABASE
+  const products = [
+    { id: 1, name: "Quantum LED Work Light", price: 1899, imgSrc: "https://placehold.co/400x300/00F0FF/0A0E1A?text=LED+LIGHT" },
+    { id: 2, name: "Neon Hand Tool Kit", price: 3499, imgSrc: "https://placehold.co/400x300/FF006E/white?text=TOOL+KIT" },
+    { id: 3, name: "Cordless Grease Gun Xtreme", price: 9200, imgSrc: "https://placehold.co/400x300/B300FF/white?text=GREASE+GUN" },
+    { id: 4, name: "Hydraulic Cyber Pump", price: 5990, imgSrc: "https://placehold.co/400x300/00F0FF/0A0E1A?text=HYDRAULIC" },
+    { id: 5, name: "Ratchet Lashing Belt", price: 1350, imgSrc: "https://placehold.co/400x300/FFD700/0A0E1A?text=RATCHET" },
+    { id: 6, name: "Smart Chain Hoist 1T", price: 15200, imgSrc: "https://placehold.co/400x300/B300FF/white?text=HOIST" },
+    { id: 7, name: "Eco Wooden Pallet", price: 2350, imgSrc: "https://placehold.co/400x300/00F0FF/white?text=PALLET" },
+    { id: 8, name: "Impact Socket Set", price: 3750, imgSrc: "https://placehold.co/400x300/FF006E/white?text=SOCKET" }
+  ];
+
+  let cart = [];
+  function updateCartUI() {
+    const cartCountSpan = document.getElementById('cartCount');
+    const cartItemsDiv = document.getElementById('cartItemsList');
+    const cartTotalSpan = document.getElementById('cartTotal');
+    let total = 0;
+    cartItemsDiv.innerHTML = '';
+    if(cart.length === 0) cartItemsDiv.innerHTML = '<p style="color:var(--neon-cyan);"><i class="fas fa-database"></i> Cart empty. Add futuristic gear.</p>';
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      cartItemsDiv.innerHTML += `
+        <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--neon-cyan); margin-bottom:12px; padding:8px 0;">
+          <div><strong style="color:white;">${item.name}</strong><br>₹${item.price} x ${item.quantity}</div>
+          <button class="removeItemBtn" data-id="${item.id}" style="background:var(--neon-pink); color:white; border:none; border-radius:20px; padding:5px 14px;">X</button>
+        </div>
+      `;
+    });
+    cartTotalSpan.innerText = total;
+    cartCountSpan.innerText = cart.reduce((acc,i) => acc + i.quantity, 0);
+    document.querySelectorAll('.removeItemBtn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(btn.dataset.id);
+        cart = cart.filter(item => item.id !== id);
+        updateCartUI(); saveCart(); renderProducts();
+      });
+    });
+  }
+  function addToCart(product) {
+    const existing = cart.find(item => item.id === product.id);
+    if(existing) existing.quantity += 1;
+    else cart.push({ ...product, quantity: 1 });
+    updateCartUI(); saveCart(); renderProducts();
+  }
+  function saveCart() { localStorage.setItem('jrcCartNeon', JSON.stringify(cart)); }
+  function loadCart() { const saved = localStorage.getItem('jrcCartNeon'); if(saved) cart = JSON.parse(saved); updateCartUI(); }
+
+  function renderProducts() {
+    const container = document.getElementById('productsGrid');
+    if(!container) return;
+    container.innerHTML = '';
+    products.forEach(prod => {
+      const cartItem = cart.find(c => c.id === prod.id);
+      const qty = cartItem ? cartItem.quantity : 0;
+      container.innerHTML += `
+        <div class="product-card">
+          <div class="product-img"><img src="${prod.imgSrc}" alt="${prod.name}" onerror="this.src='https://placehold.co/400x300/00F0FF/0A0E1A?text=JRC'"></div>
+          <h3 style="margin:0.8rem 0;">${prod.name}</h3>
+          <p style="font-weight:700; color:var(--neon-pink);">₹${prod.price}</p>
+          <button class="addToCartBtn" data-id="${prod.id}" style="background:linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); border:none; border-radius:40px; padding:10px; width:100%; color:#0A0E1A; font-weight:bold; margin-top:8px;"><i class="fas fa-cart-plus"></i> Add ${qty > 0 ? `(${qty})` : ''}</button>
+        </div>
+      `;
+    });
+    document.querySelectorAll('.addToCartBtn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = parseInt(btn.dataset.id);
+        const product = products.find(p => p.id === id);
+        addToCart(product);
+      });
+    });
+  }
+
+  // PAGE NAVIGATION
+  const pages = { home: document.getElementById('home-page'), products: document.getElementById('products-page'), engineering: document.getElementById('engineering-page'), contact: document.getElementById('contact-page') };
+  function activatePage(pageId) {
+    Object.values(pages).forEach(p => p.classList.remove('active-page'));
+    pages[pageId].classList.add('active-page');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector(`.nav-link[data-page="${pageId}"]`).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if(pageId === 'products') renderProducts();
+  }
+  document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); activatePage(link.dataset.page); }));
+  document.getElementById('shopNowBtn')?.addEventListener('click', () => activatePage('products'));
+  
+  // CART SIDEBAR
+  const cartSidebar = document.getElementById('cartSidebar'), cartOverlay = document.getElementById('cartOverlay');
+  document.getElementById('cartIcon').onclick = () => { cartSidebar.classList.add('open'); cartOverlay.style.display = 'block'; };
+  document.getElementById('closeCartBtn').onclick = () => { cartSidebar.classList.remove('open'); cartOverlay.style.display = 'none'; };
+  cartOverlay.onclick = () => { cartSidebar.classList.remove('open'); cartOverlay.style.display = 'none'; };
+  
+  function getCartMessage() {
+    if(cart.length === 0) return "Hello JRC Workmate, I'm interested in your futuristic industrial products. Please share catalog.";
+    let msg = "Hello JRC Workmate, I want to enquire about:%0A";
+    cart.forEach(item => msg += `- ${item.name} x ${item.quantity} = ₹${item.price * item.quantity}%0A`);
+    msg += `%0ATotal: ₹${document.getElementById('cartTotal').innerText}%0APlease share quote and availability.`;
+    return msg;
+  }
+  document.getElementById('enquiryNowBtn').onclick = () => { window.open(`https://wa.me/916379537625?text=${getCartMessage()}`, '_blank'); };
+  document.getElementById('emailEnquiryBtn').onclick = () => { window.location.href = `mailto:jrctradingworkmate@gmail.com?subject=Neon%20Industrial%20Enquiry&body=${encodeURIComponent(getCartMessage().replace(/%0A/g, "\n"))}`; };
+  document.getElementById('whatsappContactBtn')?.addEventListener('click', () => window.open('https://wa.me/916379537625?text=Hello%20JRC%20Workmate%2C%20I%20need%20assistance%20regarding%20industrial%20products.', '_blank'));
+  document.getElementById('mailContactBtn')?.addEventListener('click', () => window.location.href = 'mailto:jrctradingworkmate@gmail.com?subject=Enquiry%20from%20Website&body=Hi%2C%20I%20would%20like%20to%20know%20more.');
+  
+  // MOVABLE DRONE with smooth drag
+  const drone = document.getElementById('dragDrone');
+  let dragActive = false, offX, offY, startLeftDrone, startTopDrone;
+  drone.addEventListener('mousedown', (e) => {
+    dragActive = true; const rect = drone.getBoundingClientRect();
+    offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+    startLeftDrone = rect.left; startTopDrone = rect.top;
+    drone.style.cursor = 'grabbing'; e.preventDefault();
+  });
+  window.addEventListener('mousemove', (e) => {
+    if(!dragActive) return;
+    let newLeft = e.clientX - offX, newTop = e.clientY - offY;
+    newLeft = Math.min(Math.max(newLeft, 10), window.innerWidth - drone.offsetWidth - 10);
+    newTop = Math.min(Math.max(newTop, 70), window.innerHeight - drone.offsetHeight - 20);
+    drone.style.left = newLeft + 'px'; drone.style.top = newTop + 'px'; drone.style.right = 'auto'; drone.style.bottom = 'auto'; drone.style.position = 'fixed';
+  });
+  window.addEventListener('mouseup', () => { dragActive = false; drone.style.cursor = 'grab'; });
+  drone.addEventListener('click', () => { cartSidebar.classList.add('open'); cartOverlay.style.display = 'block'; });
+  
+  // generate floating particles
+  for(let i=0;i<45;i++) {
+    let particle = document.createElement('div');
+    particle.classList.add('floating-particle');
+    let size = Math.random() * 5 + 2;
+    particle.style.width = size+'px'; particle.style.height = size+'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.background = `hsl(${Math.random() * 60 + 180}, 100%, 60%)`;
+    document.body.appendChild(particle);
+    gsap.to(particle, { duration: Math.random() * 15 + 10, x: "random(-200,200)", y: "random(-150,150)", repeat: -1, yoyo: true, ease: "sine.inOut" });
+  }
+  
+  // animate floating orbs
+  gsap.to('.floating-orb', { duration: 28, x: "random(-90,90)", y: "random(-70,70)", repeat: -1, yoyo: true, ease: "sine.inOut" });
+  loadCart(); renderProducts();
+</script>
+</body>
+</html>
